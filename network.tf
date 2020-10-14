@@ -30,7 +30,7 @@ resource "aws_route_table" "rtb_public" {
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name = "publicRouteTable"
+    Name = "PublicRouteTable"
   }
 }
 
