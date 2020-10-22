@@ -203,3 +203,18 @@ variable "db-security-group-name" {
   description = "Database security group name"
   type = string
 }
+
+variable "cidr_sg" {
+  description = "CIDR block for the route table"
+  type = list(string)
+}
+
+variable "egres_port" {
+  description = "Egres port"
+  type = number
+}
+
+variable "egress-protocol" {
+  description = "Egres port"
+  type = string
+}

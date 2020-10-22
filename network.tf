@@ -76,7 +76,7 @@ resource "aws_security_group" "application_security_group" {
     from_port   = var.ssh-port
     to_port     = var.ssh-port
     protocol    = var.protocol-tcp
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_sg
   }
 
   ingress {
@@ -84,7 +84,7 @@ resource "aws_security_group" "application_security_group" {
     from_port   = var.https-port
     to_port     = var.https-port
     protocol    = var.protocol-tcp
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_sg
   }
 
   ingress {
@@ -92,7 +92,7 @@ resource "aws_security_group" "application_security_group" {
     from_port   = var.http-port
     to_port     = var.http-port
     protocol    = var.protocol-tcp
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_sg
   }
 
   ingress {
@@ -100,16 +100,15 @@ resource "aws_security_group" "application_security_group" {
     from_port   = var.application-port
     to_port     = var.application-port
     protocol    = var.protocol-tcp
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_sg
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
+    from_port   = var.egres_port
+    to_port     = var.egres_port
+    protocol    = var.egress-protocol
+    cidr_blocks = var.cidr_sg
+ }
   tags = {
     Name = "Application security group"
   }
@@ -126,12 +125,6 @@ resource "aws_security_group" "db_security_group" {
    security_groups = [aws_security_group.application_security_group.id]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   tags = {
     Name = "Database security group"
   }
@@ -179,7 +172,7 @@ resource "aws_db_instance" "rds_db" {
   instance_class            = var.rds-instance-class
   name                      = var.rds-db-name
   username                  = var.rds-db-username
-  password                  = var.rds-db-username
+  password                  = var.rds-db-password
   identifier                = var.rds-db-identifier
   multi_az                  = false
   publicly_accessible       = false
@@ -188,8 +181,6 @@ resource "aws_db_instance" "rds_db" {
   vpc_security_group_ids    = [aws_security_group.db_security_group.id]
   skip_final_snapshot = true
 }
-
-#MASTER NOT VERIFIED
 
 data "aws_iam_policy_document" "webapps3policy" {
   version = "2012-10-17"
@@ -258,10 +249,12 @@ resource "aws_instance" "ec2_instance" {
     #!/bin/bash
     apt-get install unzip
     echo "DATABASE_HOST_NAME=${aws_db_instance.rds_db.address}" > /home/ubuntu/.env
-    echo "DATABASE_USER_NAME=${aws_db_instance.rds_db.username}0" >> /home/ubuntu/.env
+    echo "DATABASE_USER_NAME=${aws_db_instance.rds_db.username}" >> /home/ubuntu/.env
     echo "DATABASE_PASSWORD=${aws_db_instance.rds_db.password}" >> /home/ubuntu/.env
-    echo "DATABASE_NAME=csye6225" >> /home/ubuntu/.env
-    echo "S3BUCKETNAME=webapp.aparna.ashok" >> /home/ubuntu/.env
+    echo "DATABASE_NAME=${var.rds-db-name}" >> /home/ubuntu/.env
+    echo "DATABASE_PORT=${var.database-port}" >> /home/ubuntu/.env
+    echo "S3BUCKETNAME=${var.bucket-name}" >> /home/ubuntu/.env
+    echo "PORT=${var.application-port}" >> /home/ubuntu/.env
   EOT
   tags = {
     Name = var.ec2-name
