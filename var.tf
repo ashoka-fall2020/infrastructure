@@ -218,3 +218,108 @@ variable "egress-protocol" {
   description = "Egres port"
   type = string
 }
+
+variable "codeploy-s3-bucket-name" {
+  description = "S3 bucket storage name for code deploy"
+  type = string
+}
+
+variable "aws-account-id" {
+  description = "AWS account id"
+  type = string
+}
+
+variable "aws-region" {
+  description = "AWS region"
+  type = string
+}
+
+variable "code-deploy-application-name" {
+  description = "AWS deploy application name"
+  type = string
+}
+
+variable "code-deploy-service-role-name" {
+  description = "AWS code deploy service name"
+  type = string
+}
+
+variable "code-deploy-ec2-s3-name" {
+  description = "Code deploy policy name"
+  type = string
+}
+
+variable "gh-upload-s3-policy-name" {
+  description = "Code deploy policy name"
+  type = string
+}
+
+variable "gh-code-deploy-name" {
+  description = "Code deploy name"
+  type = string
+}
+
+variable "ci-cd-user-name" {
+  description = "Code deploy name"
+  type = string
+}
+
+variable "public_dns_name" {
+  description = "Public dns name"
+  type = string
+}
+
+variable "code-deploy-application-group-name" {
+  description = "AWS deploy application name"
+  type = string
+}
+
+variable "route53-recode-name" {
+  description = "Route 53 recode name"
+  type = string
+}
+
+variable "route53-recode-type" {
+  description = "Route 53 recode type"
+  type = string
+}
+
+variable "route53-recode-ttl" {
+  description = "Route 53 recode TTL"
+  type = string
+}
+
+variable "route-53-zone-name" {
+  description = "Route 53 zone name"
+  type = string
+}
+
+variable "deployment-config-name" {
+  description = "Deployment-Config-Name"
+  type = string
+}
+
+variable "deployment-type" {
+  description = "Deployment Type"
+  type = string
+}
+
+variable "filter-key" {
+  description = "EC2 Tag Filter Key"
+  type = string
+}
+
+variable "filter-type" {
+  description = "EC2 Tag Filter Type"
+  type = string
+}
+
+variable "deployment-failure-event" {
+  description = "Deployment failure event"
+  type = string
+}
+
+variable "code-deploy-application-compute-platform" {
+  description = "Application compute platform"
+  type = string
+}
