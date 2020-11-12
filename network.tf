@@ -232,6 +232,11 @@ resource "aws_iam_role_policy_attachment" "ec2-codedeploy-attach" {
   policy_arn = aws_iam_policy.code-deploy-ec2-s3.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ec2-cloudwatch-attach" {
+  role = aws_iam_role.code-deploy-ec2-service-role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
 resource "aws_key_pair" "ec2-key" {
   key_name   = var.ec2-keypair-name
   public_key = var.public-key
