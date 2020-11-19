@@ -323,3 +323,176 @@ variable "code-deploy-application-compute-platform" {
   description = "Application compute platform"
   type = string
 }
+
+variable "launch-configuration-name" {
+  description = "Name of launch configuration"
+  type = string
+}
+
+variable "autoscale-group-name" {
+  description = "Name of auto scale group"
+  type = string
+}
+
+variable "health-checkup-type" {
+  description = "health checkup type"
+  type = string
+}
+
+variable "load-balancer-security-group-name" {
+  description = "Security group name"
+  type = string
+}
+variable "http-protocol" {
+  description = "HTTP PROTOCOL"
+  type = string
+}
+variable "listener-action" {
+  description = "Listener action"
+  type = string
+}
+
+variable "webapp-scaleup-policy-name" {
+  description = "Webapp scaleup policy name"
+  type = string
+}
+
+variable "webapp-scaleup-adjustment" {
+  description = "Webapp scaleup adjustment"
+  type = number
+}
+
+variable "webapp-scaleup-type" {
+  description = "Webapp scaleup type"
+  type = string
+}
+
+variable "webapp-scale-cooldown" {
+  description = "Webapp scale cooldown time"
+  type = number
+}
+
+variable "webapp-scaledown-policy-name" {
+  description = "Webapp scale down policy name"
+  type = string
+}
+
+variable "webapp-scaledown-adjustment" {
+  description = "Webapp scale down adjustment"
+  type = number
+}
+
+variable "lb-target-group-name" {
+  description = "Load balance target group name"
+  type = string
+}
+
+variable "lb-target-group-type" {
+  description = "Load balance target group type"
+  type = string
+}
+
+variable "cpu-low-alarm-name" {
+  description = "CPU Low Alarm name"
+  type = string
+}
+
+variable "cpu-high-alarm-name" {
+  description = "CPU high alarm name"
+  type = string
+}
+
+variable "cpu-alarm-high-threshold" {
+  description = "CPU high threshold"
+  type = string
+}
+
+variable "cpu-alarm-low-threshold" {
+  description = "CPU low threshold"
+  type = string
+}
+
+variable "cloud-watch-metric-name" {
+  description = "Cloud watch metric name"
+  type = string
+}
+
+variable "cloud-watch-evaluation-periods" {
+  description = "Cloud watch evaluation periods"
+  type = string
+}
+
+variable "cloud-watch-metric-namespace" {
+  description = "Cloud watch name space"
+  type = string
+}
+
+variable "cloud-watch-metric-period" {
+  description = "Cloud watch metric period"
+  type = string
+}
+
+variable "cloud-watch-metric-statistics" {
+  description = "Cloud watch statistics"
+  type = string
+}
+
+variable "cloud-watch-metric-low-threshold" {
+  description = "Cloud watch metric low threshold"
+  type = string
+}
+
+variable "cloud-watch-metric-high-threshold" {
+  description = "Cloud watch metric low threshold"
+  type = string
+}
+
+variable "healthy-threshold" {
+  description = "Cloud watch metric high threshold"
+  type = number
+}
+
+variable "unhealthy-threshold" {
+  description = "Cloud watch metric high threshold"
+  type = number
+}
+
+variable "health-checkup-timeout" {
+  description = "Health checkup timeout"
+  type = number
+}
+
+variable "health-checkup-interval" {
+  description = "Health checkup interval"
+  type = number
+}
+
+variable "health-checkup-path" {
+  description = "Health checkup path"
+  type = string
+}
+
+variable "load-balancer-name" {
+  description = "Load balancer name"
+  type = string
+}
+
+variable "load-balancer-type" {
+  description = "Load balancer type"
+  type = string
+}
+
+variable "min-scale-value" {
+  description = "auto scaling min value"
+  type = string
+}
+
+variable "max-scale-value" {
+  description = "auto scaling max value"
+  type = string
+}
+
+variable "desired-capacity" {
+  description = "Desired capacity"
+  type = string
+}
