@@ -239,6 +239,11 @@ resource "aws_iam_role_policy_attachment" "ec2-cloudwatch-attach" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+resource "aws_iam_role_policy_attachment" "ec2-lambda-attach" {
+  role = aws_iam_role.code-deploy-ec2-service-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+}
+
 resource "aws_key_pair" "ec2-key" {
   key_name   = var.ec2-keypair-name
   public_key = var.public-key
@@ -278,9 +283,14 @@ resource aws_dynamodb_table "dynamodb"{
   hash_key = var.dynamodb-hashkey
   write_capacity  = var.dynamodb-write-capacity
   read_capacity  = var.dynamodb-read-capacity
+  billing_mode   = "PAY_PER_REQUEST"
   attribute {
     name = var.dynamodb-hashkey
     type = var.dynamodb-hashkey-type
+  }
+  ttl {
+    attribute_name = "timetolive"
+    enabled        = true
   }
 }
 
@@ -356,6 +366,29 @@ data "aws_iam_policy_document" "github-code-deploy" {
 resource "aws_iam_policy" "gh-code-deploy" {
   name = var.gh-code-deploy-name
   policy = data.aws_iam_policy_document.github-code-deploy.json
+}
+
+resource "aws_iam_user_policy_attachment" "lambda-gh-code-deploy" {
+  user       = var.ci-cd-user-name
+  policy_arn = aws_iam_policy.lambda-code-deploy.arn
+}
+
+data "aws_iam_policy_document" "lambda-code-deploy" {
+  version = "2012-10-17"
+  statement {
+    effect = "Allow"
+    actions = [
+      "lambda:CreateFunction",
+      "lambda:GetFunction",
+      "lambda:UpdateFunctionCode"
+    ]
+    resources = ["arn:aws:lambda:${var.aws-region}:${var.aws-account-id}:function:EmailService"]
+  }
+}
+
+resource "aws_iam_policy" "lambda-code-deploy" {
+  name = "lambda-code-deploy"
+  policy = data.aws_iam_policy_document.lambda-code-deploy.json
 }
 
 resource "aws_iam_role" "code-deploy-ec2-service-role" {
@@ -484,6 +517,9 @@ resource "aws_launch_configuration" "webapp-launch-config" {
       echo "DATABASE_PORT=${var.database-port}" >> /home/ubuntu/.env
       echo "S3BUCKETNAME=${var.bucket-name}" >> /home/ubuntu/.env
       echo "PORT=${var.application-port}" >> /home/ubuntu/.env
+      echo "TOPICARN=${aws_sns_topic.email-service-topic.arn}" >> /home/ubuntu/.env
+      echo "S3REGION=${var.region}" >> /home/ubuntu/.env
+      echo "DOMAINNAME=${var.api-domain-name}" >> /home/ubuntu/.env
     EOT
     iam_instance_profile   = aws_iam_instance_profile.iam_instance_profile.name
     name = var.launch-configuration-name
@@ -662,3 +698,82 @@ resource "aws_codedeploy_deployment_group" "deployment_group" {
     }
   }
 }
+
+// Assignment-9
+resource "aws_iam_role" "lambda-role" {
+  name = "lambda-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lamba_role_policy_1" {
+  role       = aws_iam_role.lambda-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lamba_role_policy_2" {
+  role       = aws_iam_role.lambda-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lamba_role_policy_3" {
+  role       = aws_iam_role.lambda-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
+data "archive_file" "test" {
+  type = "zip"
+  output_path = "lambda.zip"
+  source {
+    content = "console.log('Lambda content')"
+    filename = "index.js"
+  }
+}
+
+resource "aws_lambda_function" "email-service" {
+  role             = aws_iam_role.lambda-role.arn
+  handler          = "index.handler"
+  runtime          = "nodejs12.x"
+  function_name    = "EmailService"
+  timeout          = 20
+  reserved_concurrent_executions = 1
+  filename = data.archive_file.test.output_path
+  environment {
+    variables = {
+      DOMAINNAME = var.domain-name
+    }
+  }
+}
+
+resource "aws_lambda_permission" "lambda-permission" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.email-service.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.email-service-topic.arn
+}
+
+resource "aws_sns_topic" "email-service-topic" {
+  name = "email-service-topic"
+  depends_on = [aws_lambda_function.email-service]
+}
+
+resource "aws_sns_topic_subscription" "email-sns-subscription" {
+  topic_arn = aws_sns_topic.email-service-topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.email-service.arn
+}
+

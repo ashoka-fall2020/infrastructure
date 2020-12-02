@@ -496,3 +496,17 @@ variable "desired-capacity" {
   description = "Desired capacity"
   type = string
 }
+variable "domain-name" {
+  description = "Domain Name"
+  type = string
+}
+
+variable "api-domain-name" {
+  description = "Domain Name"
+  type = string
+}
+
+variable "handler-name" {
+  description = "Handler Name"
+  type = string
+}
