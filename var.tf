@@ -510,3 +510,8 @@ variable "handler-name" {
   description = "Handler Name"
   type = string
 }
+
+variable "lambda-function-name" {
+  description = "Lambda Function Name"
+  type = string
+}

@@ -288,10 +288,6 @@ resource aws_dynamodb_table "dynamodb"{
     name = var.dynamodb-hashkey
     type = var.dynamodb-hashkey-type
   }
-  ttl {
-    attribute_name = "timetolive"
-    enabled        = true
-  }
 }
 
 // Assignmnet 6
@@ -739,7 +735,7 @@ data "archive_file" "test" {
   output_path = "lambda.zip"
   source {
     content = "console.log('Lambda content')"
-    filename = "index.js"
+    filename = var.handler-name
   }
 }
 
@@ -747,7 +743,7 @@ resource "aws_lambda_function" "email-service" {
   role             = aws_iam_role.lambda-role.arn
   handler          = "index.handler"
   runtime          = "nodejs12.x"
-  function_name    = "EmailService"
+  function_name    = var.lambda-function-name
   timeout          = 20
   reserved_concurrent_executions = 1
   filename = data.archive_file.test.output_path
