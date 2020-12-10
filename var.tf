@@ -347,6 +347,11 @@ variable "http-protocol" {
   description = "HTTP PROTOCOL"
   type = string
 }
+
+variable "https-protocol" {
+  description = "HTTPS PROTOCOL"
+  type = string
+}
 variable "listener-action" {
   description = "Listener action"
   type = string
@@ -513,5 +518,15 @@ variable "handler-name" {
 
 variable "lambda-function-name" {
   description = "Lambda Function Name"
+  type = string
+}
+
+variable "ssl-certificate-arn" {
+  description = "Lambda Function Name"
+  type = string
+}
+
+variable "ssl-key-rds" {
+  description = "SSL name for RDS"
   type = string
 }
