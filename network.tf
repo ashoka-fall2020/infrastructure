@@ -182,6 +182,7 @@ resource "aws_db_instance" "rds_db" {
   db_subnet_group_name      = aws_db_subnet_group.aws_db_subnet_group.name
   vpc_security_group_ids    = [aws_security_group.db_security_group.id]
   skip_final_snapshot = true
+  storage_encrypted = true
 }
 
 data "aws_iam_policy_document" "webapps3policy" {
@@ -516,6 +517,7 @@ resource "aws_launch_configuration" "webapp-launch-config" {
       echo "TOPICARN=${aws_sns_topic.email-service-topic.arn}" >> /home/ubuntu/.env
       echo "S3REGION=${var.region}" >> /home/ubuntu/.env
       echo "DOMAINNAME=${var.api-domain-name}" >> /home/ubuntu/.env
+      echo "SSL_KEY=${var.ssl-key-rds}" >> /home/ubuntu/.env
     EOT
     iam_instance_profile   = aws_iam_instance_profile.iam_instance_profile.name
     name = var.launch-configuration-name
@@ -544,8 +546,8 @@ resource "aws_security_group" "load-balancer-security-group" {
   vpc_id = aws_vpc.vpc.id
 
   ingress {
-    from_port   = var.http-port
-    to_port     = var.http-port
+    from_port   = var.https-port
+    to_port     = var.https-port
     protocol    = var.protocol-tcp
     cidr_blocks = var.cidr_sg
   }
@@ -578,8 +580,10 @@ resource "aws_lb" "webapp-elb" {
 
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.webapp-elb.arn
-  port = var.http-port
-  protocol = var.http-protocol
+  port = var.https-port
+  protocol = var.https-protocol
+  certificate_arn = var.ssl-certificate-arn
+
   default_action {
     type = var.listener-action
     target_group_arn = aws_lb_target_group.target-group-lb.arn
