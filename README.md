@@ -24,7 +24,14 @@ terraform init
 terraform plan -var-file="var.tfvars"
 terraform apply -var-file="var.tfvars"
 ````
-The VPC will be generated and available in your AWS account\
+The VPC will be generated and available in your AWS account
+
+Download your SSL certificate and import the SSL certificate to certificate manager through aws cli using command:
+    
+    `aws acm import-certificate --certificate fileb://Certificate.pem \
+        --certificate-chain fileb://CertificateChain.pem \
+        --private-key fileb://PrivateKey.pem`
+
 Use the command `terraform destroy` to delete the vpc
 ## Deploy
 Go to your AWS account and launch an instance with the generated VPC
